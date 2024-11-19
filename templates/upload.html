@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File</title>
+</head>
+<body>
+    <h1>Upload a Screenshot</h1>
+    <div id="upload_screenshot">
+        <form method="post" enctype="multipart/form-data">
+            <label for="language">Language:</label>
+            <select name="language" id="language" required>
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="de">German</option>
+                <option value="ja">Japanese</option>
+                <option value="zh-TW">Chinese (Traditional)</option>
+                <option value="pt-BR">Portuguese (Brazil)</option>
+            </select><br><br>
+            <label for="file">File:</label>
+            <input type="file" name="file" id="file" required><br><br>
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+</body>
+</html>
