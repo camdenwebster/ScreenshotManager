@@ -163,3 +163,6 @@ cython_debug/
 
 # SQLite Databases
 *.db
+
+# Uploads
+uploads/*

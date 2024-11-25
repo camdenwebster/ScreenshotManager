@@ -1,0 +1,31 @@
+erDiagram
+    Screenshots ||--o{ ScreenshotOperatingSystem : has
+    Screenshots ||--o{ IgnoreRegions : contains
+    OperatingSystems ||--o{ ScreenshotOperatingSystem : supports
+
+    Screenshots {
+        integer id PK
+        string language
+        string path
+    }
+
+    OperatingSystems {
+        integer id PK
+        string name
+    }
+
+    ScreenshotOperatingSystem {
+        integer id PK
+        integer screenshot_id FK
+        integer os_id FK
+    }
+
+    IgnoreRegions {
+        integer id PK
+        integer screenshot_id FK
+        string description
+        integer x
+        integer y
+        integer width
+        integer height
+    }
