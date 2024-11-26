@@ -75,17 +75,6 @@ def upload_file():
         conn = sqlite3.connect('database.db')
         c = conn.cursor()
         c.execute('INSERT INTO screenshots (filename, filepath, language) VALUES (?, ?, ?)', (filename, filepath, language))
-        screenshot_id = c.lastrowid
-        description = request.form.get('description')
-        x = request.form.get('x')
-        y = request.form.get('y')
-        width = request.form.get('width')
-        height = request.form.get('height')
-        if description or x or y or width or height:
-            c.execute('''
-                INSERT INTO IgnoreRegions (screenshot_id, description, x, y, width, height)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', (screenshot_id, description, x, y, width, height))
         conn.commit()
         conn.close()
         return redirect(url_for('upload_file', success=True))
