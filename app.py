@@ -121,5 +121,24 @@ def screenshot_detail(id):
     conn.close()
     return render_template('detail.html', screenshot=screenshot, ignore_regions=ignore_regions)
 
+@app.route('/screenshot/<int:id>/add_ignore_region', methods=['POST'])
+def add_ignore_region(id):
+    description = request.form.get('description')
+    x = request.form.get('x')
+    y = request.form.get('y')
+    width = request.form.get('width')
+    height = request.form.get('height')
+
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO IgnoreRegions (screenshot_id, description, x, y, width, height)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (id, description, x, y, width, height))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('screenshot_detail', id=id))
+
 if __name__ == '__main__':
     app.run(debug=True)
