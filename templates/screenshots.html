@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshots</title>
+</head>
+<body>
+    <h1>Screenshots</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Filename</th>
+            <th>Filepath</th>
+            <th>Language</th>
+        </tr>
+        {% for screenshot in screenshots %}
+        <tr>
+            <td>{{ screenshot.id }}</td>
+            <td>{{ screenshot.filename }}</td>
+            <td>{{ screenshot.filepath }}</td>
+            <td>{{ screenshot.language }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="{{ url_for('upload_file') }}"><button>Upload</button></a>
+</body>
+</html>
