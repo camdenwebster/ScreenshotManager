@@ -88,7 +88,7 @@ def upload_file():
             ''', (screenshot_id, description, x, y, width, height))
         conn.commit()
         conn.close()
-        return 'File uploaded and saved to database'
+        return redirect(url_for('upload_file', success=True))
     return render_template('upload.html')
 
 if __name__ == '__main__':
