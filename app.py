@@ -91,5 +91,35 @@ def upload_file():
         return redirect(url_for('upload_file', success=True))
     return render_template('upload.html')
 
+@app.route('/screenshot/<int:id>')
+def screenshot_detail(id):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM screenshots WHERE id = ?', (id,))
+    row = c.fetchone()
+    screenshot = {
+        'id': row[0],
+        'filename': row[1],
+        'filepath': row[2],
+        'language': row[3]
+    }
+
+    c.execute('SELECT * FROM IgnoreRegions WHERE screenshot_id = ?', (id,))
+    ignore_regions = c.fetchall()
+    ignore_regions = [
+        {
+            'id': region[0],
+            'description': region[2],
+            'x': region[3],
+            'y': region[4],
+            'width': region[5],
+            'height': region[6]
+        }
+        for region in ignore_regions
+    ]
+
+    conn.close()
+    return render_template('detail.html', screenshot=screenshot, ignore_regions=ignore_regions)
+
 if __name__ == '__main__':
     app.run(debug=True)

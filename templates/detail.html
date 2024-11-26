@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot Details</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Screenshot Details</h1>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ screenshot.filename }}</h5>
+                <p class="card-text"><strong>Filepath:</strong> {{ screenshot.filepath }}</p>
+                <p class="card-text"><strong>Language:</strong> {{ screenshot.language }}</p>
+            </div>
+        </div>
+        <h2>Ignore Regions</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th>Width</th>
+                    <th>Height</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for region in ignore_regions %}
+                <tr>
+                    <td>{{ region.id }}</td>
+                    <td>{{ region.description }}</td>
+                    <td>{{ region.x }}</td>
+                    <td>{{ region.y }}</td>
+                    <td>{{ region.width }}</td>
+                    <td>{{ region.height }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('show_screenshots') }}" class="btn btn-primary">Back to Screenshots</a>
+    </div>
+</body>
+</html>
