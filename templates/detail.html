@@ -22,6 +22,7 @@
 </head>
 <body>
     <div class="container">
+        <a href="{{ url_for('show_screenshots') }}" class="btn btn-primary">Back to Screenshots</a>
         <h1>Screenshot Details</h1>
         <div class="details-container">
             <img src="{{ url_for('uploaded_file', filename=screenshot.filename) }}" alt="Screenshot" class="img-fluid screenshot-image">
@@ -30,6 +31,10 @@
                     <h5 class="card-title">{{ screenshot.filename }}</h5>
                     <p class="card-text"><strong>Filepath:</strong> {{ screenshot.filepath }}</p>
                     <p class="card-text"><strong>Language:</strong> {{ screenshot.language }}</p>
+                    <p class="card-text"><strong>Supported Operating System Versions:</strong> {% for ver in supported_operating_systems %} {{ ver.version_num }} {% endfor %}</p>
+                    
+                    <p class="card-text"> </p>
+                    
                 </div>
             </div>
         </div>
@@ -62,7 +67,6 @@
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addIgnoreRegionModal">
             Add
         </button>
-        <a href="{{ url_for('show_screenshots') }}" class="btn btn-primary">Back to Screenshots</a>
     </div>
 
     <!-- Add Ignore Region Modal -->

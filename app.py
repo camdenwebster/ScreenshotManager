@@ -32,6 +32,23 @@ def init_db():
             FOREIGN KEY(screenshot_id) REFERENCES screenshots(id)
         )
     ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS OperatingSystems (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            version_num INTEGER NOT NULL UNIQUE
+        )
+    ''')
+    initial_data = [(13,), (14,), (15,)]
+    c.executemany('INSERT OR IGNORE INTO OperatingSystems (version_num) VALUES (?)', initial_data)
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS ScreenshotOperatingSystem (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            screenshot_id INTEGER,
+            os_id INTEGER,
+            FOREIGN KEY(screenshot_id) REFERENCES screenshots(id),
+            FOREIGN KEY(os_id) REFERENCES OperatingSystems(id)
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -60,25 +77,42 @@ def show_screenshots():
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        language = request.form.get('language')
-        if not language:
-            return 'No language selected'
-        if 'file' not in request.files:
-            return 'No file part'
+        language = request.form['language']
         file = request.files['file']
-        if not file or not file.filename:
-            return 'No selected file'
-        filename = file.filename
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-        # Save to database
-        conn = sqlite3.connect('database.db')
-        c = conn.cursor()
-        c.execute('INSERT INTO screenshots (filename, filepath, language) VALUES (?, ?, ?)', (filename, filepath, language))
-        conn.commit()
-        conn.close()
-        return redirect(url_for('upload_file', success=True))
-    return render_template('upload.html')
+        os_versions = request.form.getlist('os_versions')
+
+        if file:
+            filename = file.filename
+            filepath = f'uploads/{filename}'
+            file.save(filepath)
+
+            conn = sqlite3.connect('database.db')
+            c = conn.cursor()
+            c.execute('INSERT INTO screenshots (filename, filepath, language) VALUES (?, ?, ?)', (filename, filepath, language))
+            screenshot_id = c.lastrowid
+
+            for os_id in os_versions:
+                c.execute('INSERT INTO ScreenshotOperatingSystem (screenshot_id, os_id) VALUES (?, ?)', (screenshot_id, os_id))
+
+            conn.commit()
+            conn.close()
+
+            return redirect(url_for('upload_file', success=True))
+
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM OperatingSystems')
+    operating_systems = c.fetchall()
+    operating_systems = [
+        { 
+            'id': ver[0],
+            'version_num': ver[1]
+        }
+        for ver in operating_systems
+    ]
+    conn.close()
+
+    return render_template('upload.html', operating_systems=operating_systems)
 
 @app.route('/screenshot/<int:id>')
 def screenshot_detail(id):
@@ -106,9 +140,17 @@ def screenshot_detail(id):
         }
         for region in ignore_regions
     ]
-
+    c.execute('SELECT * FROM OperatingSystems WHERE id IN (SELECT os_id FROM ScreenshotOperatingSystem WHERE screenshot_id = ?)', (id,))
+    supported_operating_systems = c.fetchall()
+    supported_operating_systems = [
+        {
+            'id': os[0],
+            'version_num': os[1]
+        }
+        for os in supported_operating_systems
+    ]
     conn.close()
-    return render_template('detail.html', screenshot=screenshot, ignore_regions=ignore_regions)
+    return render_template('detail.html', screenshot=screenshot, ignore_regions=ignore_regions, supported_operating_systems=supported_operating_systems)
 
 @app.route('/screenshot/<int:id>/add_ignore_region', methods=['POST'])
 def add_ignore_region(id):
