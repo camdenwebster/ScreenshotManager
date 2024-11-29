@@ -32,6 +32,23 @@ def init_db():
             FOREIGN KEY(screenshot_id) REFERENCES screenshots(id)
         )
     ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS OperatingSystems (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            version_num INTEGER NOT NULL
+        )
+    ''')
+    initial_data = [(13,), (14,), (15,)]
+    c.executemany('INSERT INTO OperatingSystems (version_num) VALUES (?)', initial_data)
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS ScreenshotOperatingSystem (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            screenshot_id INTEGER,
+            os_id INTEGER,
+            FOREIGN KEY(screenshot_id) REFERENCES screenshots(id),
+            FOREIGN KEY(os_id) REFERENCES OperatingSystems(id)
+        )
+    ''')
     conn.commit()
     conn.close()
 
