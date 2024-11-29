@@ -8,21 +8,33 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .screenshot-image {
+            max-width: 30%;
+            height: auto;
+            max-height: 100%;
+        }
+        .details-container {
+            display: flex;
+            align-items: flex-start;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Screenshot Details</h1>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ screenshot.filename }}</h5>
-                <p class="card-text"><strong>Filepath:</strong> {{ screenshot.filepath }}</p>
-                <p class="card-text"><strong>Language:</strong> {{ screenshot.language }}</p>
+        <div class="details-container">
+            <img src="{{ url_for('uploaded_file', filename=screenshot.filename) }}" alt="Screenshot" class="img-fluid screenshot-image">
+            <div class="card ml-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ screenshot.filename }}</h5>
+                    <p class="card-text"><strong>Filepath:</strong> {{ screenshot.filepath }}</p>
+                    <p class="card-text"><strong>Language:</strong> {{ screenshot.language }}</p>
+                </div>
             </div>
         </div>
+
         <h2>Ignore Regions</h2>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addIgnoreRegionModal">
-            Add
-        </button>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -47,6 +59,9 @@
                 {% endfor %}
             </tbody>
         </table>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addIgnoreRegionModal">
+            Add
+        </button>
         <a href="{{ url_for('show_screenshots') }}" class="btn btn-primary">Back to Screenshots</a>
     </div>
 

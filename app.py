@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, render_template
+from flask import Flask, request, redirect, url_for, render_template, send_from_directory
 import sqlite3
 import os
 
@@ -128,6 +128,10 @@ def add_ignore_region(id):
     conn.close()
 
     return redirect(url_for('screenshot_detail', id=id))
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
