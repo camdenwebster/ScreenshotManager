@@ -1,3 +1,4 @@
+from uuid import uuid4
 from flask import Flask, request, redirect, url_for, render_template, send_from_directory
 import sqlite3
 import os
@@ -82,8 +83,10 @@ def upload_file():
         os_versions = request.form.getlist('os_versions')
 
         if file:
+            uuid = str(uuid4())
+            ext = file.filename.split('.')[-1]
             filename = file.filename
-            filepath = f'uploads/{filename}'
+            filepath = f'uploads/{uuid}.{ext}'
             file.save(filepath)
 
             conn = sqlite3.connect('database.db')
@@ -124,6 +127,7 @@ def screenshot_detail(id):
         'id': row[0],
         'filename': row[1],
         'filepath': row[2],
+        'actual_filename': row[2].split('/')[-1],
         'language': row[3]
     }
 

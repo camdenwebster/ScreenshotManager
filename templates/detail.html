@@ -25,7 +25,7 @@
         <a href="{{ url_for('show_screenshots') }}" class="btn btn-primary">Back to Screenshots</a>
         <h1>Screenshot Details</h1>
         <div class="details-container">
-            <img src="{{ url_for('uploaded_file', filename=screenshot.filename) }}" alt="Screenshot" class="img-fluid screenshot-image">
+            <img src="{{ url_for('uploaded_file', filename=screenshot.actual_filename) }}" alt="Screenshot" class="img-fluid screenshot-image">
             <div class="card ml-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ screenshot.filename }}</h5>
