@@ -1,5 +1,5 @@
 from uuid import uuid4
-from flask import Flask, request, redirect, url_for, render_template, send_from_directory
+from flask import Flask, request, redirect, url_for, render_template, send_from_directory, make_response
 import sqlite3
 import os
 
@@ -175,9 +175,13 @@ def add_ignore_region(id):
 
     return redirect(url_for('screenshot_detail', id=id))
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+@app.route('/uploads/<actual_filename>')
+def uploaded_file(actual_filename):
+    filename = request.args.get('filename', actual_filename)
+    app.logger.debug(f"Serving file: {actual_filename} with download name: {filename}")
+    response = make_response(send_from_directory(app.config['UPLOAD_FOLDER'], actual_filename))
+    response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)

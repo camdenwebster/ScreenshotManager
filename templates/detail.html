@@ -25,16 +25,14 @@
         <a href="{{ url_for('show_screenshots') }}" class="btn btn-primary">Back to Screenshots</a>
         <h1>Screenshot Details</h1>
         <div class="details-container">
-            <img src="{{ url_for('uploaded_file', filename=screenshot.actual_filename) }}" alt="Screenshot" class="img-fluid screenshot-image">
+            <img src="{{ url_for('uploaded_file', actual_filename=screenshot.filepath.split('/')[-1], filename=screenshot.filename) }}" alt="Screenshot" class="img-fluid screenshot-image">
             <div class="card ml-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ screenshot.filename }}</h5>
                     <p class="card-text"><strong>Filepath:</strong> {{ screenshot.filepath }}</p>
                     <p class="card-text"><strong>Language:</strong> {{ screenshot.language }}</p>
                     <p class="card-text"><strong>Supported Operating System Versions:</strong> {% for ver in supported_operating_systems %} {{ ver.version_num }} {% endfor %}</p>
-                    
-                    <p class="card-text"> </p>
-                    
+                    <a href="{{ url_for('uploaded_file', actual_filename=screenshot.filepath.split('/')[-1], filename=screenshot.filename) }}" download="{{ screenshot.filename }}" class="btn btn-secondary mt-3">Download</a>
                 </div>
             </div>
         </div>
