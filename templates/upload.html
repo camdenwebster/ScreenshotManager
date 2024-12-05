@@ -63,12 +63,14 @@
             </select><br><br>
             <label for="file">File:</label>
             <input type="file" name="file" id="file" required><br><br>
-            <label for="os_versions">Supported Operating System Versions:</label>
-            <select name="os_versions" id="os_versions" multiple required>
-                {% for os in operating_systems %}
-                <option value="{{ os.id }}">{{ os.version_num }}</option>
-                {% endfor %}
-            </select><br><br>
+            <label for="os_versions">Supported Operating System Versions:</label><br>
+            {% for os in operating_systems %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="os_versions" id="os_{{ os.id }}" value="{{ os.id }}">
+                <label class="form-check-label" for="os_{{ os.id }}">{{ os.version_num }}</label>
+            </div>
+            {% endfor %}
+            <br>
             <input type="submit" value="Upload">
         </form>
     </div>
