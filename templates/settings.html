@@ -30,14 +30,13 @@
     </style>
 </head>
 <body>
-    <h1>Settings</h1>
     <a href="{{ url_for('show_screenshots') }}" class="btn btn-primary">Back to Screenshots</a>
-    <button class="btn btn-success" data-toggle="modal" data-target="#addOSModal">Add OS Version</button>
-    
+    <h1>Settings</h1>
     {% if error %}
     <div class="alert alert-danger mt-3">{{ error }}</div>
     {% endif %}
-    
+    <h2>Operating System Versions</h2>
+    <button class="btn btn-success" data-toggle="modal" data-target="#addOSModal">Add OS Version</button>
     <table class="table table-bordered">
         <thead>
             <tr>
