@@ -58,6 +58,7 @@
                 <td>{{ screenshot.filepath }}</td>
                 <td>{{ screenshot.language }}</td>
                 <td>
+                    <a href="{{ url_for('edit_screenshot', id=screenshot.id) }}" class="btn btn-warning">Edit</a>
                     <button class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-id="{{ screenshot.id }}">Delete</button>
                 </td>
             </tr>

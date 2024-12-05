@@ -239,5 +239,58 @@ def delete_screenshot():
 
     return redirect(url_for('show_screenshots'))
 
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_screenshot(id):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+
+    if request.method == 'POST':
+        language = request.form['language']
+        file = request.files['file']
+        os_versions = request.form.getlist('os_versions')
+
+        if file:
+            uuid = str(uuid4())
+            ext = file.filename.split('.')[-1]
+            filename = file.filename
+            filepath = f'uploads/{uuid}.{ext}'
+            file.save(filepath)
+            c.execute('UPDATE screenshots SET filename = ?, filepath = ?, language = ? WHERE id = ?', (filename, filepath, language, id))
+        else:
+            c.execute('UPDATE screenshots SET language = ? WHERE id = ?', (language, id))
+
+        c.execute('DELETE FROM ScreenshotOperatingSystem WHERE screenshot_id = ?', (id,))
+        for os_id in os_versions:
+            c.execute('INSERT INTO ScreenshotOperatingSystem (screenshot_id, os_id) VALUES (?, ?)', (id, os_id))
+
+        conn.commit()
+        conn.close()
+        return redirect(url_for('show_screenshots'))
+
+    c.execute('SELECT * FROM screenshots WHERE id = ?', (id,))
+    screenshot = c.fetchone()
+    screenshot = {
+        'id': screenshot[0],
+        'filename': screenshot[1],
+        'filepath': screenshot[2],
+        'language': screenshot[3]
+    }
+
+    c.execute('SELECT * FROM OperatingSystems')
+    operating_systems = c.fetchall()
+    operating_systems = [
+        { 
+            'id': ver[0],
+            'version_num': ver[1]
+        }
+        for ver in operating_systems
+    ]
+
+    c.execute('SELECT os_id FROM ScreenshotOperatingSystem WHERE screenshot_id = ?', (id,))
+    selected_os_versions = [row[0] for row in c.fetchall()]
+
+    conn.close()
+    return render_template('edit.html', screenshot=screenshot, operating_systems=operating_systems, selected_os_versions=selected_os_versions)
+
 if __name__ == '__main__':
     app.run(debug=True)
