@@ -176,6 +176,39 @@ def add_ignore_region(id):
 
     return redirect(url_for('screenshot_detail', id=id))
 
+@app.route('/screenshot/<int:screenshot_id>/edit_ignore_region', methods=['POST'])
+def edit_ignore_region(screenshot_id):
+    region_id = request.form.get('region_id')
+    description = request.form.get('description')
+    x = request.form.get('x')
+    y = request.form.get('y')
+    width = request.form.get('width')
+    height = request.form.get('height')
+
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''
+        UPDATE IgnoreRegions
+        SET description = ?, x = ?, y = ?, width = ?, height = ?
+        WHERE id = ?
+    ''', (description, x, y, width, height, region_id))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('screenshot_detail', id=screenshot_id))
+
+@app.route('/screenshot/<int:id>/delete_ignore_region', methods=['POST'])
+def delete_ignore_region(id):
+    screenshot_id = request.form.get('screenshot_id')
+    
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM IgnoreRegions WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('screenshot_detail', id=screenshot_id))
+
 @app.route('/uploads/<actual_filename>')
 def uploaded_file(actual_filename):
     filename = request.args.get('filename', actual_filename)
