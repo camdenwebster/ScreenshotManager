@@ -32,6 +32,10 @@
             top: 20px;
             right: 20px;
         }
+        .img-preview {
+            max-width: 100px;
+            max-height: 100px;
+        }
     </style>
 </head>
 <body>
@@ -44,6 +48,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Preview</th>
                 <th>Filename</th>
                 <th>Filepath</th>
                 <th>Language</th>
@@ -54,10 +59,12 @@
             {% for screenshot in screenshots %}
             <tr>
                 <td>{{ screenshot.id }}</td>
+                <td><img src="{{ url_for('uploaded_file', actual_filename=screenshot.filepath.split('/')[-1], filename=screenshot.filename) }}" alt="Screenshot" class="img-preview"></td>
                 <td><a href="{{ url_for('screenshot_detail', id=screenshot.id) }}">{{ screenshot.filename }}</a></td>
                 <td>{{ screenshot.filepath }}</td>
                 <td>{{ screenshot.language }}</td>
                 <td>
+                    <a href="{{ url_for('edit_screenshot', id=screenshot.id) }}" class="btn btn-warning">Edit</a>
                     <button class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-id="{{ screenshot.id }}">Delete</button>
                 </td>
             </tr>

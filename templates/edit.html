@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Screenshot</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        h1 {
+            color: #343a40;
+        }
+        #edit_screenshot {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="file"], select, textarea, input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 20px 0;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        input[type="submit"], .btn-cancel {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover, .btn-cancel:hover {
+            background-color: #0056b3;
+        }
+        .btn-cancel {
+            background-color: #6c757d;
+        }
+        .btn-cancel:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <h1>Edit Screenshot</h1>
+    <div id="edit_screenshot">
+        <form method="post" enctype="multipart/form-data">
+            <label for="language">Language:</label>
+            <select name="language" id="language" required>
+                <option value="en" {% if screenshot.language == 'en' %}selected{% endif %}>English</option>
+                <option value="fr" {% if screenshot.language == 'fr' %}selected{% endif %}>French</option>
+                <option value="es" {% if screenshot.language == 'es' %}selected{% endif %}>Spanish</option>
+                <option value="de" {% if screenshot.language == 'de' %}selected{% endif %}>German</option>
+                <option value="ja" {% if screenshot.language == 'ja' %}selected{% endif %}>Japanese</option>
+                <option value="zh-TW" {% if screenshot.language == 'zh-TW' %}selected{% endif %}>Chinese (Traditional)</option>
+                <option value="pt-BR" {% if screenshot.language == 'pt-BR' %}selected{% endif %}>Portuguese (Brazil)</option>
+            </select><br><br>
+            <label for="file">File:</label>
+            <input type="file" name="file" id="file"><br><br>
+            <label for="os_versions">Supported Operating System Versions:</label><br>
+            {% for os in operating_systems %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="os_versions" id="os_{{ os.id }}" value="{{ os.id }}" {% if os.id in selected_os_versions %}checked{% endif %}>
+                <label class="form-check-label" for="os_{{ os.id }}">{{ os.version_num }}</label>
+            </div>
+            {% endfor %}
+            <br>
+            <input type="submit" value="Save">
+            <a href="{{ url_for('show_screenshots') }}" class="btn btn-secondary btn-cancel">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>
