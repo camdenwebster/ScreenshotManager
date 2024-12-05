@@ -1,10 +1,11 @@
 from uuid import uuid4
-from flask import Flask, request, redirect, url_for, render_template, send_from_directory, make_response
+from flask import Flask, request, redirect, url_for, render_template, send_from_directory, make_response, flash
 import sqlite3
 import os
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
+app.secret_key = 'your_secret_key'  # Needed for flashing messages
 
 # Ensure the uploads directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -182,6 +183,61 @@ def uploaded_file(actual_filename):
     response = make_response(send_from_directory(app.config['UPLOAD_FOLDER'], actual_filename))
     response.headers["Content-Disposition"] = f"attachment; filename={filename}"
     return response
+
+@app.route('/settings')
+def settings():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM OperatingSystems')
+    operating_systems = c.fetchall()
+    operating_systems = [
+        { 
+            'id': ver[0],
+            'version_num': ver[1]
+        }
+        for ver in operating_systems
+    ]
+    conn.close()
+    error = request.args.get('error')
+    return render_template('settings.html', operating_systems=operating_systems, error=error)
+
+@app.route('/add_os_version', methods=['POST'])
+def add_os_version():
+    version_num = request.form['version_num']
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    try:
+        c.execute('INSERT INTO OperatingSystems (version_num) VALUES (?)', (version_num,))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return redirect(url_for('settings', error='Operating system version already exists.'))
+    conn.close()
+    return redirect(url_for('settings'))
+
+@app.route('/delete_os_version', methods=['POST'])
+def delete_os_version():
+    os_id = request.form['os_id']
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM OperatingSystems WHERE id = ?', (os_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('settings'))
+
+@app.route('/delete_screenshot', methods=['POST'])
+def delete_screenshot():
+    screenshot_id = request.form['screenshot_id']
+
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM ScreenshotOperatingSystem WHERE screenshot_id = ?', (screenshot_id,))
+    c.execute('DELETE FROM IgnoreRegions WHERE screenshot_id = ?', (screenshot_id,))
+    c.execute('DELETE FROM screenshots WHERE id = ?', (screenshot_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('show_screenshots'))
 
 if __name__ == '__main__':
     app.run(debug=True)

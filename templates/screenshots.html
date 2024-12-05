@@ -27,11 +27,19 @@
             text-align: left;
             border-bottom: 1px solid #dee2e6;
         }
+        .settings-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>Screenshots</h1>
     <a href="{{ url_for('upload_file') }}" class="btn btn-primary">Upload</a>
+    <a href="{{ url_for('settings') }}" class="btn btn-secondary settings-button">
+        <i class="fas fa-cog"></i> Settings
+    </a>
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -39,6 +47,7 @@
                 <th>Filename</th>
                 <th>Filepath</th>
                 <th>Language</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -48,9 +57,45 @@
                 <td><a href="{{ url_for('screenshot_detail', id=screenshot.id) }}">{{ screenshot.filename }}</a></td>
                 <td>{{ screenshot.filepath }}</td>
                 <td>{{ screenshot.language }}</td>
+                <td>
+                    <button class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-id="{{ screenshot.id }}">Delete</button>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this screenshot?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <form method="post" action="{{ url_for('delete_screenshot') }}">
+                        <input type="hidden" name="screenshot_id" id="screenshot_id" value="">
+                        <button type="submit" class="btn btn-danger">Yes, delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var screenshotId = button.data('id');
+            var modal = $(this);
+            modal.find('#screenshot_id').val(screenshotId);
+        });
+    </script>
 </body>
 </html>
