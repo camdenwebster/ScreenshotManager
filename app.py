@@ -12,47 +12,12 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Initialize the database
 def init_db():
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS screenshots (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            filename TEXT NOT NULL,
-            filepath TEXT NOT NULL,
-            language TEXT NOT NULL
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS IgnoreRegions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            screenshot_id INTEGER,
-            description TEXT,
-            x INTEGER,
-            y INTEGER,
-            width INTEGER,
-            height INTEGER,
-            FOREIGN KEY(screenshot_id) REFERENCES screenshots(id)
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS OperatingSystems (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            version_num INTEGER NOT NULL UNIQUE
-        )
-    ''')
-    initial_data = [(13,), (14,), (15,)]
-    c.executemany('INSERT OR IGNORE INTO OperatingSystems (version_num) VALUES (?)', initial_data)
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS ScreenshotOperatingSystem (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            screenshot_id INTEGER,
-            os_id INTEGER,
-            FOREIGN KEY(screenshot_id) REFERENCES screenshots(id),
-            FOREIGN KEY(os_id) REFERENCES OperatingSystems(id)
-        )
-    ''')
-    conn.commit()
-    conn.close()
+    with app.app_context():
+        conn = sqlite3.connect('database.db')
+        with app.open_resource('schema.sql', mode='r') as f:
+            conn.cursor().executescript(f.read())
+        conn.commit()
+        conn.close()
 
 init_db()
 
@@ -251,11 +216,21 @@ def add_os_version():
 @app.route('/delete_os_version', methods=['POST'])
 def delete_os_version():
     os_id = request.form['os_id']
+    
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute('DELETE FROM OperatingSystems WHERE id = ?', (os_id,))
-    conn.commit()
-    conn.close()
+
+    try:
+        c.execute('DELETE FROM ScreenshotOperatingSystem WHERE os_id = ?', (os_id,))
+        c.execute('DELETE FROM OperatingSystems WHERE id = ?', (os_id,))
+        conn.commit()
+    except sqlite3.Error as e:
+        conn.rollback()
+        app.logger.error(f"Error deleting operating system version: {e}")
+        flash('An error occurred while deleting the operating system version. Please try again.', 'danger')
+    finally:
+        conn.close()
+
     return redirect(url_for('settings'))
 
 @app.route('/delete_screenshot', methods=['POST'])
@@ -264,11 +239,18 @@ def delete_screenshot():
 
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute('DELETE FROM ScreenshotOperatingSystem WHERE screenshot_id = ?', (screenshot_id,))
-    c.execute('DELETE FROM IgnoreRegions WHERE screenshot_id = ?', (screenshot_id,))
-    c.execute('DELETE FROM screenshots WHERE id = ?', (screenshot_id,))
-    conn.commit()
-    conn.close()
+
+    try:
+        c.execute('DELETE FROM ScreenshotOperatingSystem WHERE screenshot_id = ?', (screenshot_id,))
+        c.execute('DELETE FROM IgnoreRegions WHERE screenshot_id = ?', (screenshot_id,))
+        c.execute('DELETE FROM screenshots WHERE id = ?', (screenshot_id,))
+        conn.commit()
+    except sqlite3.Error as e:
+        conn.rollback()
+        app.logger.error(f"Error deleting screenshot: {e}")
+        flash('An error occurred while deleting the screenshot. Please try again.', 'danger')
+    finally:
+        conn.close()
 
     return redirect(url_for('show_screenshots'))
 
