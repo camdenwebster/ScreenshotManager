@@ -27,6 +27,8 @@ ScreenshotManager is a tool designed to help test automation engineers manage sc
     ```
     
 ## Usage
+> [!NOTE]
+> The AirPlay receiver feature on macOS uses port 5000, which is the port Flask uses by default. If you receive an error when running the below command, use `flask --port 8080` (or another port number that's not in use) instead.
 1. Run the Flask application:
     ```bash
     flask run
